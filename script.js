@@ -3,51 +3,59 @@
  * @description:
  */
 
-// Créez une fonction appeléecreateCalendar(year, month)
+// Créez une fonction appelée createCalendar(year, month)
 function createCalendar(year, month) {
-    let calendrier = document.createElement("table");
-    let titre = document.createElement("caption");
-    titre.innerHTML = `le calendrier du : ${month}/${year}`;
-    calendrier.appendChild(titre);
+    //  la date du premier jour du mois
+    let premierJour = new Date(year, month, 1);
 
-    // Création des en-têtes de colonne avec les jours de la semaine Lundi, Mardi, Mercredi, Jeudi, vendredi, samedi et Dimanche
-    let semaines = document.createElement("tr");
-    let jours = ["L", "M", "M", "J", "V", "S", "D"];
-    for (let jour of jours) {
-        let jours = document.createElement("th");
-        jours.innerHTML = jour;
-        semaines.appendChild(jours);
+    // le numéro du jour de la semaine 
+    let premierJourDeLaSemaine = premierJour.getDay();
+
+    // Si le premier jour tombe un dimanche, mettre à jour le numéro du jour de la semaine 
+    if (premierJourDeLaSemaine === 0) {
+        premierJourDeLaSemaine = 7;
     }
-    calendrier.appendChild(semaines);
 
-    // Obtention du premier jour du mois et du nombre de jours dans le mois
-    let jour1 = new Date(year, month - 1, 1);
-    let nuemeroDuJour = new Date(year, month, 0).getDate();
+    //  le nombre de jours dans le mois
+    let numeroDuJour = new Date(year, month + 1, 0).getDate();
 
-    // Calcul du nombre de semaines et de la première semaine partielle
-    let numeroDeLaSemaine = Math.ceil((nuemeroDuJour + jour1.getDay()) / 7);
-    let SemainePartielle = (7 - jour1.getDay()) % 7;
+    // Créer un tableau pour stocker le calendrier
+    let calendrier = [];
 
-    // Création des lignes de semaine et des cellules de jour
-    let jour = 1;
-    for (let i = 0; i < numeroDeLaSemaine; i++) {
-        let semaines = document.createElement("tr");
-        for (let j = 0; j < 7; j++) {
-            let celluleDesJours = document.createElement("td");
-            if (i === 0 && j < SemainePartielle || jour > nuemeroDuJour) {
-                celluleDesJours.innerHTML = "&nbsp;";
-            }else {
-                celluleDesJours.innerHTML = jour;
-                jour++;
+    // Créer le titre du calendrier (noms des jours de la semaine)
+    let joursDeLaSemaine = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
+    let titre = `<tr><th>${joursDeLaSemaine.join("</th><th>")}</th></tr>`;
+    let listeTitre = document.querySelectorAll("titre");
+
+    calendrier.push(titre);
+
+    // Créer une ligne vide pour le premier jour du mois (pour aligner le calendrier correctement)
+    let cellule = "";
+    for (let i = 1; i < premierJourDeLaSemaine; i++) {
+        cellule += "<td></td>";
+    }
+
+    // Créer le reste du calendrier
+    let jourActuel = 1;
+    while (jourActuel <= numeroDuJour) {
+        let ligne = "<tr>";
+        for (let i = 1; i <= 7; i++) {
+            if (jourActuel > numeroDuJour) {
+                ligne += "<td></td>";
+            } else {
+                ligne += `<td>${jourActuel}</td>`;
+                jourActuel++;
             }
-            semaines.appendChild(celluleDesJours);
         }
-        calendrier.appendChild(semaines);
+        ligne += "</tr>";
+        calendrier.push(ligne);
     }
-    return calendrier;
-}
-let annee = prompt("Entrer une Annee (Ex: AAAA)")
-let jour = prompt("Entrer le jour (Ex: JJ)")
 
-let calendrier = createCalendar(`${annee}`,`${jour}`);
-document.body.appendChild(calendrier);
+    // Créer le tableau HTML et le retourner
+    return `<table>${calendrier.join("")}</table>`;
+}  
+
+let annee = prompt("Entrer une Annee (ex: AAAA)")
+let jour = prompt("Entrer le jour (ex: JJ)")
+let htmlCalendrier = createCalendar(`${annee}`,`${jour}`);
+document.body.innerHTML = htmlCalendrier;
